@@ -9,7 +9,7 @@ import { getFirestore } from "https://www.gstatic.com/firebasejs/11.1.0/firebase
 import { collection } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 import { addDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 import { serverTimestamp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
-
+import { getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
 /* === Firebase Setup === */
 const firebaseConfig = {
@@ -82,22 +82,26 @@ onAuthStateChanged(auth, (user) => {
 /* = Functions - Firebase - Cloud Firestore = */
 
 
+
+// Modify the function to include an emoji
 async function addPostToDB(postBody, user) {
     try {
+        // You can define your emoji here, or make it dynamic based on certain conditions
+        const emoji = "✨";  // Example emoji
+
         const docRef = await addDoc(collection(db, "Posts"), {
             body: postBody,
             uid: user.uid,
-            createdAt: serverTimestamp()
-            /* Challenge: Add a field called 'createdAt' where you save the time of creation of this post as a timestamp.
-                 You'll need to use the serverTimestamp function, which needs to be imported from "firebase/firestore" first. */
-        })
-        console.log("Document written with ID: ", docRef.id)
+            createdAt: serverTimestamp(),
+            emoji: emoji,  // Store the emoji with the post
+        });
+
+        console.log("Document written with ID: ", docRef.id);
     } catch (error) {
-        console.error(error.message)
+        console.error(error.message);
     }
- 
- 
- }
+}
+
  
 
 
@@ -198,6 +202,41 @@ function showUserGreeting(element, user) {
         addPostToDB(postBody, user)
         clearInputField(textareaEl)
     }
+ }
+ const postsListEl = document.getElementById("posts-list");
+ const fetchPostsButtonEl = document.getElementById("fetch-post-btn");
+ 
+ fetchPostsButtonEl.addEventListener("click", fetchPosts);
+ 
+ async function fetchPosts() {
+     try {
+         const postsRef = collection(db, "Posts");
+         const q = query(postsRef, orderBy("createdAt", "desc"));
+         const querySnapshot = await getDocs(q);
+         
+         postsListEl.innerHTML = "";  
+         
+         querySnapshot.forEach((doc) => {
+             const post = doc.data();
+             const postElement = document.createElement("li");
+ 
+             const createdAt = post.createdAt.toDate();
+             const formattedTime = createdAt.toLocaleString();
+ 
+             //const emoji = post.emoji || "🔥";  
+ 
+             postElement.innerHTML = `
+                 <p><small>Posted on: ${formattedTime}</small></p>
+                 <p> ${post.body}</p> 
+                 
+             `;
+             //<p><strong> ${emoji} </strong> ${post.body}<strong> ${emoji} </strong></p>  
+ 
+             postsListEl.appendChild(postElement);
+         });
+     } catch (error) {
+         console.error("Error fetching posts: ", error.message);
+     }
  }
  
  
