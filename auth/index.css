@@ -13,7 +13,7 @@
     --seconday-font: 'Calistoga', sans-serif;
     
     --border-width: 3px;
-    --element-border-radius: 5px;
+    --element-border-radius: 5px; 
     
     --button-height: 5px;
     
@@ -277,6 +277,31 @@ classes to make the sign out buttons work
     flex-direction: column;
     gap: 1em;
  }
+ .post-display-section {
+    margin-top: 20px;
+}
+
+#posts-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+#posts-list li {
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #358057;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+#posts-list li p {
+    margin: 5px 0;
+}
+
+#posts-list li small {
+    color: #888;
+}
+
  
 
 /*  credit:coursera */
