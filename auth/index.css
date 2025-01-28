@@ -289,7 +289,7 @@ classes to make the sign out buttons work
 #posts-list li {
     margin-bottom: 20px;
     padding: 10px;
-    background-color: #358057;
+    background-color: #ddd;
     border: 1px solid #ddd;
     border-radius: 5px;
 }
