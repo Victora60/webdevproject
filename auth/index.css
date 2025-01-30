@@ -301,6 +301,21 @@ classes to make the sign out buttons work
 #posts-list li small {
     color: #888;
 }
+.post-header {
+    position: relative;
+    padding-right: 30px; 
+}
+
+.emoji {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 32px; 
+}
+.emoji-picker {
+    display: none; 
+}
+
 
  
 
