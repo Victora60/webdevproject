@@ -84,23 +84,21 @@ onAuthStateChanged(auth, (user) => {
 
 
 
-async function addPostToDB(postBody, user) {
-    try {
-        
-        const emoji = "✨"; 
+async function addPostToDB(postBody, user, emoji) {
+  try {
+      const docRef = await addDoc(collection(db, "Posts"), {
+          body: postBody,
+          uid: user.uid,
+          createdAt: serverTimestamp(),
+          emoji: emoji,  
+      });
 
-        const docRef = await addDoc(collection(db, "Posts"), {
-            body: postBody,
-            uid: user.uid,
-            createdAt: serverTimestamp(),
-            emoji: emoji,  
-        });
-
-        console.log("Document written with ID: ", docRef.id);
-    } catch (error) {
-        console.error(error.message);
-    }
+      console.log("Document written with ID: ", docRef.id);
+  } catch (error) {
+      console.error(error.message);
+  }
 }
+
 
  
 
@@ -194,42 +192,73 @@ function showUserGreeting(element, user) {
       element.textContent="Hey friend, how are you?";
     }
  }
+ let selectedEmoji = "✨";  
+
+ 
+ const emojiButtons = document.querySelectorAll(".emoji-btn");
+ emojiButtons.forEach(button => {
+   button.addEventListener("click", (e) => {
+     selectedEmoji = e.target.getAttribute("data-emoji");
+     console.log("Selected Emoji:", selectedEmoji);
+   });
+ });
+ 
+
  function postButtonPressed() {
-    const postBody = textareaEl.value
-    const user = auth.currentUser
-   
-    if (postBody) {
-        addPostToDB(postBody, user)
-        clearInputField(textareaEl)
-    }
+     const postBody = textareaEl.value;
+     const user = auth.currentUser;
+ 
+     if (postBody) {
+         addPostToDB(postBody, user, selectedEmoji);
+         clearInputField(textareaEl);
+         selectedEmoji = "✨"; 
+     }
  }
+ 
  const postsListEl = document.getElementById("posts-list");
  const fetchPostsButtonEl = document.getElementById("fetch-post-btn");
  
  fetchPostsButtonEl.addEventListener("click", fetchPosts);
  
  async function fetchPosts() {
-     try {
-         const postsRef = collection(db, "Posts");
-         const q = query(postsRef, orderBy("createdAt", "desc"));
-         const querySnapshot = await getDocs(q);
-         postsListEl.innerHTML = "";  
-         querySnapshot.forEach((doc) => {
-             const post = doc.data();
-             const postElement = document.createElement("li");
-             const createdAt = post.createdAt.toDate();
-             const formattedTime = createdAt.toLocaleString();
-             const emoji = post.emoji || "✨";  
-             postElement.innerHTML = `
-                 <p><small>Posted on: ${formattedTime}</small></p>
-                 <p><strong> ${emoji} </strong> ${post.body}</p> 
-             `;
-              postsListEl.appendChild(postElement);
-         });
-     } catch (error) {
-         console.error("Error fetching posts: ", error.message);
-     }
- }
+  try {
+      const postsRef = collection(db, "Posts");
+      const q = query(postsRef, orderBy("createdAt", "desc"));
+      const querySnapshot = await getDocs(q);
+      postsListEl.innerHTML = "";  
+      querySnapshot.forEach((doc) => {
+          const post = doc.data();
+          const postElement = document.createElement("li");
+          const createdAt = post.createdAt.toDate();
+          const formattedTime = createdAt.toLocaleString();
+          const emoji = post.emoji || "✨";  
+          postElement.innerHTML = `
+          <div class="post-header">
+              <p><small>Posted on: ${formattedTime}</small></p>
+              <span class="emoji">${emoji}</span>
+          </div>
+          <p>${post.body}</p>
+      `;
+      
+      postsListEl.appendChild(postElement);
+  });
+  } catch (error) {
+      console.error("Error fetching posts: ", error.message);
+  }
+}
+
+const emojiButtonEl = document.querySelector("#emoji-btn");  
+const emojiPickerEl = document.querySelector(".emoji-picker");  
+emojiButtonEl.addEventListener("click", toggleEmojiPicker);
+function toggleEmojiPicker() {
+    if (emojiPickerEl.style.display === "none" || emojiPickerEl.style.display === "") {
+        emojiPickerEl.style.display = "block";  
+    } else {
+        emojiPickerEl.style.display = "none";  
+    }
+}
+
+
  
  
 
